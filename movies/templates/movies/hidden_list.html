@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="container p-3">
+    <h2>Hidden Movies</h2>
+    <hr />
+    <ul>
+      {% for movie in template_data.movies %}
+        <li>
+          {{ movie.name }}
+          <form method="post" action="{% url 'movies.unhide_movie' movie.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-sm">Un-hide</button>
+          </form>
+        </li>
+      {% empty %}
+        <li>No hidden movies.</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

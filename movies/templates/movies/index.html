@@ -37,6 +37,12 @@
             <a href="{% url 'movies.show' id=movie.id %}" class="btn bg-dark text-white">
             {{ movie.name }}
             </a>
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'movies.hide_movie' movie.id %}" style="margin-top:8px;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-warning btn-sm">Hide</button>
+            </form>
+            {% endif %}
           </div>
         </div>
       </div>

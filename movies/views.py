@@ -3,19 +3,42 @@ from .models import Movie, Review
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count  # ADD THIS IMPORT
 from django.contrib.auth.models import User  # ADD THIS IMPORT
+from .models import Movie, Review, HiddenMovie  # Add HiddenMovie import
+
+@login_required
+def hide_movie(request, id):
+    movie = get_object_or_404(Movie, id=id)
+    HiddenMovie.objects.get_or_create(user=request.user, movie=movie)
+    return redirect('movies.index')
+
+@login_required
+def unhide_movie(request, id):
+    hidden = HiddenMovie.objects.filter(user=request.user, movie_id=id)
+    hidden.delete()
+    return redirect('movies.hidden_list')
+
+@login_required
+def hidden_list(request):
+    hidden_movies = Movie.objects.filter(hiddenmovie__user=request.user)
+    template_data = {
+        'title': 'Hidden Movies',
+        'movies': hidden_movies,
+    }
+    return render(request, 'movies/hidden_list.html', {'template_data': template_data})
 
 def index(request):
     search_term = request.GET.get('search')
+    movies = Movie.objects.all()
+    if request.user.is_authenticated:
+        hidden_ids = HiddenMovie.objects.filter(user=request.user).values_list('movie_id', flat=True)
+        movies = movies.exclude(id__in=hidden_ids)
     if search_term:
-        movies = Movie.objects.filter(name__icontains=search_term)
-    else:
-        movies = Movie.objects.all()
-    template_data = {}
-    template_data['title'] = 'Movies'
-    template_data['movies'] = movies
-    return render(request, 'movies/index.html',
-                  {'template_data': template_data})
-
+        movies = movies.filter(name__icontains=search_term)
+    template_data = {
+        'title': 'Movies',
+        'movies': movies,
+    }
+    return render(request, 'movies/index.html', {'template_data': template_data})
 def show(request, id):
     movie = Movie.objects.get(id=id)
     reviews = Review.objects.filter(movie=movie)
