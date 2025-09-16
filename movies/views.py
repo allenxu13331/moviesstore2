@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Review
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count  # ADD THIS IMPORT
+from django.contrib.auth.models import User  # ADD THIS IMPORT
+
 def index(request):
     search_term = request.GET.get('search')
     if search_term:
@@ -12,6 +15,7 @@ def index(request):
     template_data['movies'] = movies
     return render(request, 'movies/index.html',
                   {'template_data': template_data})
+
 def show(request, id):
     movie = Movie.objects.get(id=id)
     reviews = Review.objects.filter(movie=movie)
@@ -21,6 +25,27 @@ def show(request, id):
     template_data['reviews'] = reviews
     return render(request, 'movies/show.html',
                   {'template_data': template_data})
+
+# ADD THIS NEW FUNCTION
+def top_comments(request):
+    """
+    View to display top comments and most active users
+    """
+    # Get the most recent reviews with user and movie data
+    top_reviews = Review.objects.select_related('user', 'movie').order_by('-date')[:25]
+    
+    # Get users with the most reviews (top commenters)
+    top_commenters = User.objects.annotate(
+        review_count=Count('review')
+    ).order_by('-review_count')[:10]
+    
+    template_data = {}
+    template_data['title'] = 'Top Comments'
+    template_data['reviews'] = top_reviews
+    template_data['top_commenters'] = top_commenters
+    
+    return render(request, 'movies/top_comments.html', {'template_data': template_data})
+
 @login_required
 def create_review(request, id):
     if request.method == 'POST' and request.POST['comment']!= '':
@@ -33,6 +58,7 @@ def create_review(request, id):
         return redirect('movies.show', id=id)
     else:
         return redirect('movies.show', id=id)
+
 @login_required
 def edit_review(request, id, review_id):
     review = get_object_or_404(Review, id=review_id)
@@ -50,10 +76,10 @@ def edit_review(request, id, review_id):
         return redirect('movies.show', id=id)
     else:
         return redirect('movies.show', id=id)
+
 @login_required
 def delete_review(request, id, review_id):
     review = get_object_or_404(Review, id=review_id,
         user=request.user)
     review.delete()
     return redirect('movies.show', id=id)
-# Create your views here.
