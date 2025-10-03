@@ -79,6 +79,15 @@ def delete_review(request, id, review_id):
     return redirect('movies.show', id=id)
 
 
+def petitions(request):
+    """List all petitions ordered by creation date (newest first)."""
+    petitions = Petition.objects.select_related('created_by').order_by('-created_at')
+    template_data = {
+        'title': 'Petitions',
+        'petitions': petitions,
+    }
+    return render(request, 'movies/petitions.html', {'template_data': template_data})
+
 def petitions_list(request):
     """List all petitions ordered by creation date (newest first)."""
     petitions = Petition.objects.select_related('created_by').order_by('-created_at')

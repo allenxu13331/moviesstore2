@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="container">
+    <h1>{{ template_data.title }}</h1>
+    <p><a href="{% url 'movies.petition_create' %}">Create a new petition</a></p>
+
+    {% if template_data.petitions %}
+      {% for petition in template_data.petitions %}
+        <div style="border:1px solid #ddd;padding:12px;margin-bottom:12px;border-radius:6px;">
+          <h3>{{ petition.title }}</h3>
+          <p style="color:#555">{{ petition.description }}</p>
+          <p style="font-size:0.9em;color:#777">By {{ petition.created_by.username }} on {{ petition.created_at|date:"M d, Y" }}</p>
+          {% with summary=petition.votes_summary %}
+            <p>
+              Votes: {{ summary.total }} — Yes: {{ summary.yes }} ({{ summary.percent_yes|floatformat:0 }}%) | No: {{ summary.no }}
+            </p>
+          {% endwith %}
+
+          {% if user.is_authenticated %}
+            <form action="{% url 'movies.petition_vote' petition.id %}" method="post" style="display:inline-block;margin-right:8px;">
+              {% csrf_token %}
+              <button type="submit" name="vote" value="yes">Vote YES</button>
+            </form>
+            <form action="{% url 'movies.petition_vote' petition.id %}" method="post" style="display:inline-block;">
+              {% csrf_token %}
+              <button type="submit" name="vote" value="no">Vote NO</button>
+            </form>
+          {% else %}
+            <p><a href="{% url 'accounts.login' %}">Log in</a> to vote.</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No petitions yet. Be the first to create one.</p>
+    {% endif %}
+
+  </div>
+{% endblock %}

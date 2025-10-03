@@ -9,7 +9,8 @@ urlpatterns = [
     path('<int:id>/review/<int:review_id>/delete/', views.delete_review, name='movies.delete_review'),
     path('top-comments/', views.top_comments, name='movies.top_comments'),  # ADD THIS LINE
     # Petitions
-    path('petitions/', views.petitions_list, name='movies.petitions_list'),
+    path('petitions/', views.petitions, name='movies.petitions'),
+    path('petitions/list/', views.petitions_list, name='movies.petitions_list'),
     path('petitions/create/', views.petition_create, name='movies.petition_create'),
     path('petitions/<int:petition_id>/vote/', views.petition_vote, name='movies.petition_vote'),
 ]
