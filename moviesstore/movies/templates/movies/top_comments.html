@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ template_data.title }} - MoviesStore</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            gap: 30px;
+        }
+        .comments-section {
+            flex: 2;
+        }
+        .users-section {
+            flex: 1;
+        }
+        .comment-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .comment-author {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .comment-movie {
+            font-style: italic;
+            color: #6c757d;
+        }
+        .comment-date {
+            color: #999;
+            font-size: 0.9em;
+        }
+        .user-card {
+            background: #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .user-stats {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Include your navigation if you have one -->
+    
+    <div class="container">
+        <div class="comments-section">
+            <div class="page-header">
+                <h1>🎬 Top Movie Comments</h1>
+                <p>Discover the latest comments from our community!</p>
+            </div>
+            
+            {% if template_data.reviews %}
+                {% for review in template_data.reviews %}
+                <div class="comment-card">
+                    <div class="comment-content">
+                        "{{ review.comment }}"
+                    </div>
+                    <div class="comment-meta">
+                        <span class="comment-author">By: {{ review.user.username }}</span> | 
+                        <span class="comment-movie">Movie: {{ review.movie.name }}</span> | 
+                        <span class="comment-date">{{ review.date|date:"M d, Y H:i" }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No comments found. Be the first to comment on a movie!</p>
+            {% endif %}
+        </div>
+        
+        <div class="users-section">
+            <h2>🏆 Top Commenters</h2>
+            {% if template_data.top_commenters %}
+                {% for user in template_data.top_commenters %}
+                <div class="user-card">
+                    <div class="user-name">{{ user.username }}</div>
+                    <div class="user-stats">{{ user.review_count }} comments</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No active commenters yet.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Include footer if you have one -->
+</body>
+</html>
+

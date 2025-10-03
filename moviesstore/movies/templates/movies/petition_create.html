@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="container">
+    <h1>{{ template_data.title }}</h1>
+
+    <form method="post">
+      {% csrf_token %}
+      {{ template_data.form.as_p }}
+      <button type="submit">Create Petition</button>
+    </form>
+
+    <p><a href="{% url 'movies.petitions_list' %}">Back to petitions</a></p>
+  </div>
+{% endblock %}

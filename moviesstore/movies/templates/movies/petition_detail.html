@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="container">
+    <h1>{{ petition.title }}</h1>
+    <p>{{ petition.description }}</p>
+    <p>By {{ petition.created_by.username }} on {{ petition.created_at|date:"M d, Y" }}</p>
+    {% with summary=petition.votes_summary %}
+      <p>Votes: {{ summary.total }} — Yes: {{ summary.yes }} ({{ summary.percent_yes|floatformat:0 }}%) | No: {{ summary.no }}</p>
+    {% endwith %}
+
+    {% if user.is_authenticated %}
+      <form action="{% url 'movies.petition_vote' petition.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" name="vote" value="yes">Vote YES</button>
+        <button type="submit" name="vote" value="no">Vote NO</button>
+      </form>
+    {% else %}
+      <p><a href="{% url 'accounts.login' %}">Log in</a> to vote.</p>
+    {% endif %}
+
+    <p><a href="{% url 'movies.petitions_list' %}">Back to petitions</a></p>
+  </div>
+{% endblock %}
